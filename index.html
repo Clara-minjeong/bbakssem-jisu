@@ -338,31 +338,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
 <div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E8ECFD;display:flex;align-items:center;justify-content:center;font-size:13px">✅</span><span style="font-size:14.5px;font-weight:700;color:#4B61E8">필수 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">없으면 사망</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
-<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">🌂 장우산</span>
-<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">👟 방수 운동화</span>
-<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">😷 KF94 마스크</span>
-<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">🧻 손수건</span>
+<div id="kitEssential" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size:13px;font-weight:500;color:#2E3B8F;background:#EEF1FD;padding:9px 13px;border-radius:12px">🌂 장우산</span>
 </div>
 </div>
 
 <div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
 <div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E6EDFF;display:flex;align-items:center;justify-content:center;font-size:13px">➕</span><span style="font-size:14.5px;font-weight:700;color:#5B6CF0">보조 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">있으면 쾌적</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
-<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧴 물티슈</span>
-<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧥 얇은 가디건</span>
-<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧦 여분 양말</span>
-<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">📎 헤어 클립</span>
+<div id="kitSupply" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size:13px;font-weight:500;color:#39429E;background:#EDF0FF;padding:9px 13px;border-radius:12px">🧴 물티슈</span>
 </div>
 </div>
 
 <div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
 <div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E4E7F1;display:flex;align-items:center;justify-content:center;font-size:13px">🚫</span><span style="font-size:14.5px;font-weight:700;color:#5A6385">금지 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">들면 자폭</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
-<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">🤍 흰 바지·흰 운동화</span>
-<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">👞 스웨이드 신발</span>
-<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">🛍️ 종이 쇼핑백</span>
-<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">✨ 새 구두</span>
+<div id="kitForbid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size:13px;font-weight:500;color:#5A6385;background:#EEF0F6;padding:9px 13px;border-radius:12px;text-decoration:line-through;text-decoration-color:rgba(90,99,133,.5)">✨ 새 구두</span>
 </div>
 </div>
 
@@ -730,6 +721,7 @@ class App {
     this.updateDebuff(this._weather, this._sub);
     this.updateTags(this._weather, this._sub);
     this.updateActivity(this._weather);
+    this.updateKit(this._weather);
   }
   pickBoss(sub) {
     let best = 'life', bv = -1;
@@ -803,12 +795,22 @@ class App {
   }
   updateDebuff(w, sub) {
     const di = this.discomfort(w.tmax, w.hum);
-    const name = { life: '습도', weather: '폭우', air: '미세먼지', move: '강풍', day: this.WDAY[w.wday] + '요일' };
+    const weatherName = w.precip >= 70 ? '폭우' : w.precip >= 40 ? '비' : w.precip >= 15 ? '이슬비' : w.code >= 2 ? '흐린 날씨' : '맑음';
+    const moveName = w.wind >= 14 ? '폭풍' : w.wind >= 9 ? '강풍' : w.wind >= 5 ? '바람' : (w.precip >= 40 ? '강수' : '이동 쾌적');
+    const airName = w.pm10 > 150 ? '최악 미세먼지' : w.pm10 > 80 ? '미세먼지' : w.pm10 > 30 ? '약한 미세먼지' : '공기 양호';
+    const lifeName = w.hum >= 85 ? '극한 습도' : w.hum >= 70 ? '높은 습도' : (w.tmax >= 33 ? '폭염' : w.tmax >= 28 ? '더위' : w.tmax < 5 ? '한파' : w.tmax < 10 ? '추위' : '생활 쾌적');
+    const name = {
+      life: lifeName,
+      weather: weatherName,
+      air: airName,
+      move: moveName,
+      day: this.WDAY[w.wday] + '요일',
+    };
     const desc = {
-      life: '습도 ' + w.hum + '% · 불쾌지수 ' + di,
-      weather: '강수확률 ' + w.precip + '% · 강수량 ' + w.rain + 'mm',
-      air: '미세먼지 ' + w.pm10 + '(' + this.cat10(w.pm10) + ') · 폐활량 ↓',
-      move: '바람 ' + w.wind + 'm/s · ' + (w.wind >= 10 ? '우산 파괴 위험' : '헤어 붕괴 주의'),
+      life: '습도 ' + w.hum + '% · 불쾌지수 ' + di + (w.tmax >= 28 ? ' · 체감 더움' : w.tmax < 10 ? ' · 체감 추움' : ''),
+      weather: '강수확률 ' + w.precip + '% · ' + this.codeText(w.code) + ' · 최고 ' + w.tmax + '°C',
+      air: '미세먼지 ' + w.pm10 + 'μg(' + this.cat10(w.pm10) + ') · 초미세 ' + w.pm25 + 'μg',
+      move: '바람 ' + w.wind + 'm/s · ' + (w.wind >= 14 ? '우산 역방향 주의' : w.wind >= 9 ? '우산 파괴 위험' : w.precip >= 40 ? '빗길 이동 주의' : '이동 무난'),
       day: this.WDAY[w.wday] + '요일 · 주말까지 D-' + this.daysToWeekend(w.wday),
     };
     const order = ['life', 'weather', 'air', 'move', 'day'].sort((a, b) => sub[b] - sub[a]);
@@ -855,13 +857,70 @@ class App {
       laundry: humid ? [1, '습도 ' + w.hum + '%, 절대 안 마름'] : (rain || w.hum >= 65) ? [2, '실내 건조 권장'] : [4, '잘 마르는 날'],
       date: heavyRain ? [3, '실내 코스면 무난'] : [4, '무난한 데이트 날씨'],
       cafe: rain ? [5, '빗소리 BGM, 집중 최적'] : [4, '집중하기 좋아요'],
-      home: (heavyRain || dusty || humid) ? [5, '오늘의 정답. 이불 밖은 위험'] : [3, '쉬어가도 좋은 날'],
+      home: (heavyRain || dusty || humid) ? [5, (this._dayOffset === 0 ? '오늘' : '내일') + '의 정답. 이불 밖은 위험'] : [3, '쉬어가도 좋은 날'],
     };
     Object.keys(acts).forEach(k => {
       const [stars, d] = acts[k];
       const ds = document.getElementById('act-' + k + '-desc'); if (ds) ds.textContent = d;
       const st = document.getElementById('act-' + k + '-stars'); if (st) this.renderStars(st, stars);
     });
+  }
+  updateKit(w) {
+    const heavyRain = w.precip >= 60, rain = w.precip >= 30, drizzle = w.precip >= 10;
+    const dusty = w.pm10 > 80, badAir = w.pm10 > 30;
+    const humid = w.hum >= 80, muggy = w.hum >= 65;
+    const veryCold = w.tmax < 5, cold = w.tmax < 12, chilly = w.tmax < 18;
+    const hot = w.tmax >= 30, warm = w.tmax >= 26;
+    const windy = w.wind >= 10, breezy = w.wind >= 6;
+    const snow = w.code >= 71 && w.code <= 77;
+
+    const must = [], nice = [], ban = [];
+
+    if (heavyRain)       { must.push('🌂 장우산', '☔ 방수 재킷'); }
+    else if (rain)       { must.push('🌂 우산'); }
+    else if (drizzle)    { must.push('☂️ 휴대용 우산'); }
+
+    if (snow)            { must.push('🥾 방수 부츠'); }
+    else if (rain)       { must.push('👟 방수 운동화'); }
+
+    if (dusty)           { must.push('😷 KF94 마스크'); }
+    else if (badAir)     { must.push('😷 마스크'); }
+
+    if (veryCold)        { must.push('🧥 패딩', '🧣 목도리', '🧤 장갑'); }
+    else if (cold)       { must.push('🧥 따뜻한 외투', '🧣 목도리'); }
+    else if (chilly)     { must.push('🧥 가디건·자켓'); }
+
+    if (hot && humid)    { must.push('🧴 선크림', '🧋 텀블러'); }
+    else if (hot)        { must.push('🧴 선크림'); }
+
+    if (windy && rain)   { must.push('💨 바람막이'); }
+    if (must.length === 0) must.push('📱 스마트폰', '💳 카드');
+
+    if (rain)            { nice.push('🧦 여분 양말', '🧻 손수건'); }
+    if (humid || muggy)  { nice.push('🧴 물티슈'); }
+    if (hot)             { nice.push('🪭 접이식 부채'); }
+    if (chilly && !cold) { nice.push('🔥 핫팩'); }
+    if (dusty)           { nice.push('💊 알레르기약'); }
+    if (breezy && !rain) { nice.push('🧢 캡 모자'); }
+    if (warm && !dusty)  { nice.push('🕶️ 선글라스'); }
+    if (nice.length === 0) nice.push('🎧 이어폰', '💊 두통약');
+
+    if (rain)            { ban.push('🤍 흰 바지·흰 운동화', '👞 스웨이드 신발', '🛍️ 종이 쇼핑백'); }
+    if (heavyRain)       { ban.push('☂️ 접이식 우산'); }
+    if (windy)           { ban.push('🎩 챙 넓은 모자'); }
+    if (snow || rain)    { ban.push('✨ 새 구두'); }
+    if (hot)             { ban.push('🧥 두꺼운 외투'); }
+    if (muggy)           { ban.push('🧶 나일론·폴리 소재'); }
+    if (ban.length === 0) ban.push('🧥 두꺼운 외투', '☂️ 큰 우산');
+
+    const mkMust = t => `<span style="font-size:13px;font-weight:500;color:#2E3B8F;background:#EEF1FD;padding:9px 13px;border-radius:12px">${t}</span>`;
+    const mkNice = t => `<span style="font-size:13px;font-weight:500;color:#39429E;background:#EDF0FF;padding:9px 13px;border-radius:12px">${t}</span>`;
+    const mkBan  = t => `<span style="font-size:13px;font-weight:500;color:#5A6385;background:#EEF0F6;padding:9px 13px;border-radius:12px;text-decoration:line-through;text-decoration-color:rgba(90,99,133,.5)">${t}</span>`;
+
+    const set = (id, items, fn) => { const el = document.getElementById(id); if (el) el.innerHTML = items.slice(0,5).map(fn).join(''); };
+    set('kitEssential', must, mkMust);
+    set('kitSupply', nice, mkNice);
+    set('kitForbid', ban, mkBan);
   }
   discomfort(t, h) { return Math.round(0.81 * t + 0.01 * h * (0.99 * t - 14.3) + 46.3); }
   daysToWeekend(wd) { return (wd === 0 || wd === 6) ? 0 : 6 - wd; }
