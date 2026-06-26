@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내일 빡셈지수</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}
+body{font-family:Pretendard,system-ui,sans-serif;background:#FFFFFF}
+[data-sec]{scroll-margin-top:128px}
+::selection{background:#DCE4FB}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
+@keyframes floatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes rainfall{0%{transform:translateY(-60px);opacity:0}20%{opacity:.7}100%{transform:translateY(360px);opacity:0}}
+@keyframes fillIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.12);opacity:.2}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-9px) rotate(6deg)}}
+@keyframes dropfall{0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(18px);opacity:0}}
+</style>
+</head>
+<body>
+<div id="pageWrap" style="min-height:100vh;display:flex;justify-content:center;background:#FFFFFF">
+<div style="width:100%;max-width:480px;background:transparent;position:relative;padding-bottom:60px">
+
+<!-- STICKY HEADER -->
+<div id="hudHeader" style="position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);background:rgba(255,255,255,.85);padding:14px 18px 10px">
+
+<!-- CHIP NAV -->
+<div style="box-sizing: border-box"><div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-size:24px; line-height: 1">📡</span>
+<div style="display: flex; flex-direction: column; line-height: 1.15; gap: 4px">
+<span id="appTitle" style="font-size:18px; font-weight: 700; color: #14161F; letter-spacing: -.02em">내일 빡셈지수</span><span id="locLine" title="탭하면 현재 위치(GPS)로 갱신" style="font-size:14px; font-weight: 600; color: #8A8FA3; cursor:pointer">서울 강남구 · 내일 6.26(목)</span>
+
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:6px">
+
+<a href="#share" style="width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 24px; box-shadow: 0 2px 8px rgba(20,22,31,.08); background-color: #ffffff; line-height: 0; text-transform: none">↗</a>
+</div>
+</div>
+<!-- DAY TOGGLE -->
+<div style="display:flex;gap:6px;margin-top:10px">
+<button id="toggleToday" style="flex:1;border:none;cursor:pointer;font-family:Pretendard,sans-serif;font-size:13px;font-weight:700;padding:8px 0;border-radius:12px;background:#F0F1F6;color:#6B7080;transition:background .15s,color .15s">오늘</button>
+<button id="toggleTomorrow" style="flex:1;border:none;cursor:pointer;font-family:Pretendard,sans-serif;font-size:13px;font-weight:700;padding:8px 0;border-radius:12px;background:#14161F;color:#fff;transition:background .15s,color .15s">내일</button>
+</div>
+<div style="display:flex;gap:7px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none">
+<a data-chip="home" href="#home" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: #4B61E8; color: #fff; white-space: nowrap">홈</a>
+<a data-chip="debuff" href="#debuff" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">디버프</a>
+<a data-chip="breakdown" href="#breakdown" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">변수분석</a>
+<a data-chip="boss" href="#boss" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">보스몹</a>
+<a data-chip="kit" href="#kit" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">생존키트</a>
+<a data-chip="activity" href="#activity" style="flex: none; text-decoration: none; font-size:14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">활동적합도</a>
+<a data-chip="share" href="#share" style="flex: none; text-decoration: none; font-size: 14px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: transparent; color: #6B7080; white-space: nowrap">공유</a>
+</div></div>
+</div>
+
+<div id="hudBody" style="padding:6px 16px 0">
+
+<!-- ============ HOME ============ -->
+<section id="home" data-sec="" data-screen-label="Home" style="position:relative;background:#fff;border-radius:30px;padding:26px 22px 24px;box-shadow:0 18px 50px -22px rgba(20,22,31,.12);overflow:hidden">
+<div style="position:absolute;inset:0;background:radial-gradient(90% 55% at 50% 8%,#DCE4FB 0%,rgba(220,228,251,0) 60%);pointer-events:none"></div>
+<!-- rain -->
+<div id="rainFx" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; opacity: .5; left: 0px; top: 3px">
+<span style="position:absolute;left:12%;top:0;width:2px;height:22px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1.1s linear infinite"></span>
+<span style="position:absolute;left:28%;top:0;width:2px;height:18px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1.4s linear .3s infinite"></span>
+<span style="position:absolute;left:46%;top:0;width:2px;height:24px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1s linear .6s infinite"></span>
+<span style="position:absolute;left:66%;top:0;width:2px;height:16px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1.3s linear .15s infinite"></span>
+<span style="position:absolute;left:82%;top:0;width:2px;height:20px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1.15s linear .5s infinite"></span>
+<span style="position:absolute;left:90%;top:0;width:2px;height:22px;border-radius:2px;background:linear-gradient(#9FB4E8,transparent);animation:rainfall 1.5s linear .8s infinite"></span>
+</div>
+
+<div style="position:relative">
+<div style="display:flex;align-items:center;gap:7px">
+<span id="dayLabelHome" style="font-size: 12px; font-weight: 500; color: #8A8FA3">내일의 생활 난이도</span>
+<span style="font-size: 10.5px; font-weight: 700; color: #4B61E8; padding: 3px 8px; border-radius: 999px; background-color: #ffffff">LIVE</span>
+</div>
+
+<!-- big score + blob -->
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:6px">
+<div>
+<div id="tempRange" style="font-size:13px;font-weight:600;color:#8A8FA3;margin-bottom:6px;letter-spacing:-.01em">– / –°C</div>
+<div style="display:flex;align-items:flex-start;gap:2px">
+<span id="bigScore" style="font-size:84px;font-weight:700;line-height:.9;letter-spacing:-.05em;color:#14161F">78</span>
+<span style="font-size:23px;font-weight:700;color:#C4C8D6;margin-top:7px">/100</span>
+</div>
+<div id="gradeBoxHome" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:#3344C7;padding:8px 14px;border-radius:14px">
+<span id="gradeLabelHome" style="font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em">HELL</span>
+<span id="gradeRangeHome" style="font-size:10.5px;font-weight:700;color:rgba(255,255,255,.85)">76–90</span>
+</div>
+</div>
+
+<!-- CHARACTER (수치별 이미지) -->
+<div style="position:relative;width:132px;height:172px;flex:none;display:flex;align-items:flex-end;justify-content:center;margin:14px 12px -6px -14px">
+<img id="charImg" src="assets/char-4.png" alt="" style="width:148px;height:auto;object-fit:contain;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 10px 18px rgba(75,97,232,.26))">
+</div>
+</div>
+
+<!-- one-liner verdict -->
+<div style="position: relative; margin-top: 18px; background: #14161F; border-radius: 20px; padding: 18px 18px; width: 100%">
+<div id="verdictMain" style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.35;text-wrap:pretty">흰 바지 금지.<br>내일은 바닥이 이깁니다.</div>
+<div style="display:flex;align-items:center;gap:7px;margin-top:10px">
+<span style="font-size:13px">👾</span>
+<span id="verdictSub" style="font-size:13px;font-weight:600;color:#B7BBCB;text-wrap:pretty">비·습도·미세먼지 3종 세트. 오늘의 보스몹은 <b style="color:#9DB4FF">습도</b>입니다.</span>
+</div><div style="margin-top:18px">
+<div style="position:relative">
+<div style="display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: #EEF0F7">
+<div style="flex:30;background:#AFC0FA"></div>
+<div style="flex:25;background:#8098F2"></div>
+<div style="flex:20;background:#5B6CF0"></div>
+<div style="flex:15;background:#3A47C4"></div>
+<div style="flex:10;background:#232E8F"></div>
+</div>
+<div id="meterDot" style="position:absolute;top:50%;left:78%;transform:translate(-50%,-50%);width:14px;height:14px;background:#14161F;border:2.5px solid #fff;border-radius:50%;box-shadow:0 2px 7px rgba(0,0,0,.32);transition:left .12s linear"></div>
+</div>
+<div style="position:relative;height:0">
+<div id="gradeMarker" style="position:absolute;left:78%;top:-19px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center">
+
+</div>
+</div>
+<div id="meterLabels" style="display:flex;justify-content:space-between;margin-top:8px">
+<span style="font-size:9.5px;font-weight:700;color:#A6AAB8">EASY</span>
+<span style="font-size:9.5px;font-weight:700;color:#A6AAB8">NORMAL</span>
+<span style="font-size:9.5px;font-weight:700;color:#A6AAB8">HARD</span>
+<span style="font-size:9.5px;font-weight:700;color:#3A47C4">HELL</span>
+<span style="font-size:9.5px;font-weight:700;color:#A6AAB8">BOSS</span>
+</div>
+</div>
+</div>
+
+<!-- grade meter -->
+
+
+<a href="#debuff" style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; text-decoration: none; background: #E8ECFD; color: #4B61E8; font-size: 14px; font-weight: 700; padding: 14px; border-radius: 16px">오늘의 디버프 보기 <span style="font-size:15px">↓</span></a>
+</div>
+</section>
+
+<!-- ============ DEBUFF ============ -->
+<section id="debuff" data-sec="" data-screen-label="Debuff" style="margin-top:30px">
+<div style="display:flex;align-items:center;gap:8px;margin:0 6px 4px">
+
+</div>
+<h2 style="margin:0 6px;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em">활성화된 디버프</h2>
+
+
+<div id="dbList" style="display:flex;flex-direction:column;gap:11px;margin-top:16px">
+
+<div id="db-life" style="display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 20px; padding: 15px 16px; box-shadow: 0px 10px 30px -20px #14161f1f">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; background-color: #edf2ff">💧</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px"><span id="dbName-life" style="font-size:15.5px;font-weight:700;color:#14161F">습도</span><span id="dbBadge-life" style="font-size: 10px; font-weight: 700; color: #fff; background: #3344C7; padding: 3px 7px; border-radius: 6px">BOSS</span></div>
+<div id="dbDesc-life" style="font-size:12px;font-weight:600;color:#8A8FA3;margin-top:3px">습도 측정 중…</div>
+</div>
+<div id="dbBars-life" style="display:flex;gap:3px;flex:none"><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span></div>
+</div>
+
+<div id="db-weather" style="display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 20px; padding: 15px 16px; box-shadow: 0px 10px 30px -20px #14161f1f">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; background-color: #edf2ff" data-comment-anchor="8b10660833-div">☔</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px"><span id="dbName-weather" style="font-size:15.5px;font-weight:700;color:#14161F">폭우</span><span id="dbBadge-weather" style="font-size: 10px; font-weight: 700; color: #232E8F; background: #E1E6FA; padding: 3px 7px; border-radius: 6px">치명적</span></div>
+<div id="dbDesc-weather" style="font-size:12px;font-weight:600;color:#8A8FA3;margin-top:3px">강수 측정 중…</div>
+</div>
+<div id="dbBars-weather" style="display:flex;gap:3px;flex:none"><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span></div>
+</div>
+
+<div id="db-air" style="display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 20px; padding: 15px 16px; box-shadow: 0px 10px 30px -20px #14161f1f">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; background-color: #edf2ff">😷</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px"><span id="dbName-air" style="font-size:15.5px;font-weight:700;color:#14161F">미세먼지</span><span id="dbBadge-air" style="font-size: 10px; font-weight: 700; color: #4B61E8; background: #E8ECFD; padding: 3px 7px; border-radius: 6px">나쁨</span></div>
+<div id="dbDesc-air" style="font-size:12px;font-weight:600;color:#8A8FA3;margin-top:3px">미세먼지 측정 중…</div>
+</div>
+<div id="dbBars-air" style="display:flex;gap:3px;flex:none"><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span></div>
+</div>
+
+<div id="db-move" style="display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 20px; padding: 15px 16px; box-shadow: 0px 10px 30px -20px #14161f1f">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; background-color: #edf2ff">🌬️</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px"><span id="dbName-move" style="font-size:15.5px;font-weight:700;color:#14161F">강풍</span><span id="dbBadge-move" style="font-size: 10px; font-weight: 700; color: #4B61E8; background: #E8ECFD; padding: 3px 7px; border-radius: 6px">주의</span></div>
+<div id="dbDesc-move" style="font-size:12px;font-weight:600;color:#8A8FA3;margin-top:3px">바람 측정 중…</div>
+</div>
+<div id="dbBars-move" style="display:flex;gap:3px;flex:none"><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span></div>
+</div>
+
+<div id="db-day" style="display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 20px; padding: 15px 16px; box-shadow: 0px 10px 30px -20px #14161f1f">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; background-color: #edf2ff">📅</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px"><span id="dbName-day" style="font-size:15.5px;font-weight:700;color:#14161F">요일</span><span id="dbBadge-day" style="font-size: 10px; font-weight: 700; color: #6B7080; background: #EEF0F7; padding: 3px 7px; border-radius: 6px">약함</span></div>
+<div id="dbDesc-day" style="font-size:12px;font-weight:600;color:#8A8FA3;margin-top:3px">요일 분석 중…</div>
+</div>
+<div id="dbBars-day" style="display:flex;gap:3px;flex:none"><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span><span style="width:7px;height:18px;border-radius:3px;background:#E7E9F0"></span></div>
+</div>
+
+</div>
+</section>
+
+<!-- ============ BREAKDOWN ============ -->
+<section id="breakdown" data-sec="" data-screen-label="Breakdown" style="margin-top: 34px; background: #fff; border-radius: 30px; padding: 24px 22px; box-shadow: 0px 14px 40px -24px #14161f1f">
+
+<h2 style="margin:4px 0 0;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em"><span id="bdTitleScore">78</span>점은 이렇게 나왔어요</h2>
+
+
+<div id="bdList" style="display:flex;flex-direction:column;gap:18px;margin-top:20px">
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:17px">🌧️</span><span style="font-size:14.5px;font-weight:700;color:#14161F">날씨</span></div>
+<span id="bdwScore" style="font-size:14px;font-weight:700;color:#3344C7">18<span style="color:#C4C8D6;font-weight:700">/20</span></span>
+</div>
+<div style="height:9px;background:#F0F1F6;border-radius:999px;margin-top:8px;overflow:hidden"><div id="bdwBar" style="height:100%;width:90%;border-radius:999px;background:linear-gradient(90deg,#6E86F5,#3344C7);transform-origin:left;animation:fillIn 1s cubic-bezier(.2,.7,.2,1) both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+<div id="bdwDesc" style="font-size: 12px; font-weight: 500; color: #9498A8; margin-top: 7px">강수확률 80% · 종일 비 · 기온 24°C 후덥지근</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:17px">🫧</span><span style="font-size:14.5px;font-weight:700;color:#14161F">공기</span></div>
+<span id="bdaScore" style="font-size:14px;font-weight:700;color:#6E86F5">16<span style="color:#C4C8D6;font-weight:700">/20</span></span>
+</div>
+<div style="height:9px;background:#F0F1F6;border-radius:999px;margin-top:8px;overflow:hidden"><div id="bdaBar" style="height:100%;width:80%;border-radius:999px;background:linear-gradient(90deg,#9DB4FF,#6E86F5);transform-origin:left;animation:fillIn 1s cubic-bezier(.2,.7,.2,1) .1s both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+<div id="bdaDesc" style="font-size: 12px; font-weight: 500; color: #9498A8; margin-top: 7px">미세먼지 나쁨(82) · 초미세 나쁨</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:17px">🚇</span><span style="font-size:14.5px;font-weight:700;color:#14161F">이동</span></div>
+<span id="bdmScore" style="font-size:14px;font-weight:700;color:#6E86F5">15<span style="color:#C4C8D6;font-weight:700">/20</span></span>
+</div>
+<div style="height:9px;background:#F0F1F6;border-radius:999px;margin-top:8px;overflow:hidden"><div id="bdmBar" style="height:100%;width:75%;border-radius:999px;background:linear-gradient(90deg,#9DB4FF,#6E86F5);transform-origin:left;animation:fillIn 1s cubic-bezier(.2,.7,.2,1) .2s both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+<div id="bdmDesc" style="font-size: 12px; font-weight: 500; color: #9498A8; margin-top: 7px">강풍 7m/s · 퇴근길 정체 · 우산 무력화</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:17px">💦</span><span style="font-size:14.5px;font-weight:700;color:#14161F">생활</span></div>
+<span id="bdlScore" style="font-size:14px;font-weight:700;color:#3344C7">17<span style="color:#C4C8D6;font-weight:700">/20</span></span>
+</div>
+<div style="height:9px;background:#F0F1F6;border-radius:999px;margin-top:8px;overflow:hidden"><div id="bdlBar" style="height:100%;width:85%;border-radius:999px;background:linear-gradient(90deg,#6E86F5,#3344C7);transform-origin:left;animation:fillIn 1s cubic-bezier(.2,.7,.2,1) .3s both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+<div id="bdlDesc" style="font-size: 12px; font-weight: 500; color: #9498A8; margin-top: 7px">습도 85% · 불쾌지수 81 · 끈적임 MAX</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:17px">🗓️</span><span style="font-size:14.5px;font-weight:700;color:#14161F">요일</span></div>
+<span id="bddScore" style="font-size:14px;font-weight:700;color:#8B90A6">12<span style="color:#C4C8D6;font-weight:700">/20</span></span>
+</div>
+<div style="height:9px;background:#F0F1F6;border-radius:999px;margin-top:8px;overflow:hidden"><div id="bddBar" style="height:100%;width:60%;border-radius:999px;background:linear-gradient(90deg,#C4CCE8,#8E99C4);transform-origin:left;animation:fillIn 1s cubic-bezier(.2,.7,.2,1) .4s both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+<div id="bddDesc" style="font-size: 12px; font-weight: 500; color: #9498A8; margin-top: 7px">목요일 · 주말까지 D-1 · 번아웃 누적</div>
+</div>
+
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:22px;padding-top:18px;border-top:1px dashed #E4E6EF">
+<span style="font-size:13px;font-weight:700;color:#6B7080">종합 빡셈지수</span>
+<span style="font-size:22px;font-weight:700;color:#14161F"><span id="bdTotal">78</span><span style="font-size:14px;color:#C4C8D6">/100</span></span>
+</div>
+</section>
+
+<!-- ============ BOSS ============ -->
+<section id="boss" data-sec="" data-screen-label="Boss" style="margin-top:34px">
+<div style="display:flex;align-items:center;gap:8px;margin:0 6px 4px">
+
+</div>
+<h2 id="dayLabelBoss" style="margin:0 6px 16px;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em">오늘의 보스몹</h2>
+
+<div style="position: relative; border-radius: 28px; padding: 24px 22px; overflow: hidden; background: linear-gradient(155deg,#1B2350 0%,#2E3B8F 52%,#4B61E8 100%); box-shadow: 0px 24px 50px -22px #8a9aff99; width: 100%">
+<div style="position:absolute;top:-40px;right:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%);animation:pulse 4s ease-in-out infinite"></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between">
+<div style="display: block">
+<span id="bossLevel" style="font-size: 12px; font-weight: 500; letter-spacing: .12em; color: #B9C8F7">LV.85 · ELITE</span>
+<div style="box-sizing: border-box"><div id="bossName" style="font-size:30px;font-weight:700;color:#fff;letter-spacing:-.03em;margin-top:2px">습도</div><div id="bossSub" style="font-size: 14px; font-weight: 700; color: #C6CFF1">끈적임의 군주</div></div>
+
+</div>
+<div style="width: 96px; height: 96px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; animation: floatSlow 3.5s ease-in-out infinite; background-color: #f4f8ffeb" id="bossEmoji">💧</div>
+</div>
+
+<!-- HP -->
+<div style="position:relative;margin-top:20px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+<span style="font-size:10.5px;font-weight:700;color:#B9C8F7;letter-spacing:.08em">HP</span>
+<span id="bossHpText" style="font-size:10.5px;font-weight:700;color:#fff">8,500 / 10,000</span>
+</div>
+<div style="height:11px;background:rgba(255,255,255,.16);border-radius:999px;overflow:hidden"><div id="bossHpBar" style="height:100%;width:85%;border-radius:999px;background:linear-gradient(90deg,#6E86F5,#9DB4FF);transform-origin:left;animation:fillIn 1.1s cubic-bezier(.2,.7,.2,1) both;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div></div>
+</div>
+
+<!-- stats -->
+<div style="position:relative;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px">
+<div style="background:rgba(255,255,255,.1);border-radius:14px;padding:11px 13px">
+<div style="font-size: 12px; font-weight: 700; color: #B9C8F7">주 공격</div>
+<div id="bossAtk" style="font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px">끈적임 · 불쾌지수</div>
+</div>
+<div style="background:rgba(255,255,255,.1);border-radius:14px;padding:11px 13px">
+<div style="font-size: 12px; font-weight: 700; color: #B9C8F7">패시브</div>
+<div id="bossPassive" style="font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px">샤워 후 5분 재출현</div>
+</div>
+<div style="grid-column:1/3;background:rgba(127,196,255,.18);border-radius:14px;padding:11px 13px;border:1px solid rgba(127,196,255,.4)">
+<div style="font-size: 12px; font-weight: 700; color: #BFE2FF">🛡️ 약점</div>
+<div id="bossWeak" style="font-size: 14px; font-weight: 500; color: #fff; margin-top: 2px">실내 · 제습기 · 에어컨 송풍</div>
+</div>
+</div>
+
+<div style="position:relative;margin-top:16px;display:flex;gap:9px;align-items:flex-start">
+
+
+</div>
+</div>
+</section>
+
+<!-- ============ SURVIVAL KIT ============ -->
+<section id="kit" data-sec="" data-screen-label="SurvivalKit" style="margin-top:34px">
+
+<h2 id="dayLabelKit" style="margin:4px 6px 0;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em">내일의 생존 장비</h2>
+
+
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+
+<div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E8ECFD;display:flex;align-items:center;justify-content:center;font-size:13px">✅</span><span style="font-size:14.5px;font-weight:700;color:#4B61E8">필수 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">없으면 사망</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">🌂 장우산</span>
+<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">👟 방수 운동화</span>
+<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">😷 KF94 마스크</span>
+<span style="font-size: 13px; font-weight: 500; color: #2E3B8F; background: #EEF1FD; padding: 9px 13px; border-radius: 12px">🧻 손수건</span>
+</div>
+</div>
+
+<div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E6EDFF;display:flex;align-items:center;justify-content:center;font-size:13px">➕</span><span style="font-size:14.5px;font-weight:700;color:#5B6CF0">보조 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">있으면 쾌적</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧴 물티슈</span>
+<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧥 얇은 가디건</span>
+<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">🧦 여분 양말</span>
+<span style="font-size: 13px; font-weight: 500; color: #39429E; background: #EDF0FF; padding: 9px 13px; border-radius: 12px">📎 헤어 클립</span>
+</div>
+</div>
+
+<div style="background: #fff; border-radius: 22px; padding: 17px 18px; box-shadow: 0px 10px 30px -22px #14161f1f">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:24px;height:24px;border-radius:8px;background:#E4E7F1;display:flex;align-items:center;justify-content:center;font-size:13px">🚫</span><span style="font-size:14.5px;font-weight:700;color:#5A6385">금지 장비</span><span style="font-size: 12px; font-weight: 600; color: #A6AAB8">들면 자폭</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:13px">
+<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">🤍 흰 바지·흰 운동화</span>
+<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">👞 스웨이드 신발</span>
+<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">🛍️ 종이 쇼핑백</span>
+<span style="font-size: 13px; font-weight: 500; color: #5A6385; background: #EEF0F6; padding: 9px 13px; border-radius: 12px; text-decoration: line-through; text-decoration-color: rgba(90,99,133,.5)">✨ 새 구두</span>
+</div>
+</div>
+
+</div>
+</section>
+
+<!-- ============ ACTIVITY FIT ============ -->
+<section id="activity" data-sec="" data-screen-label="ActivityFit" style="margin-top: 34px; background: #fff; border-radius: 30px; padding: 24px 20px; box-shadow: 0px 14px 40px -24px #14161f1e">
+
+<h2 id="dayLabelActivity" style="margin:4px 0 0;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em">내일 뭐하기 좋을까</h2>
+
+
+<div style="display:flex;flex-direction:column;gap:3px;margin-top:16px">
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">🚇</span>
+
+<div style="flex: 1; flex-grow: 4"><div style="font-size: 16px; font-weight: 700; color: #14161F">출근</div><div id="act-commute-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">회피 불가… 일찍 나서세요</div></div><div id="act-commute-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">🚶</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">산책</div><div id="act-walk-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">비+미세먼지, 오늘은 패스</div></div>
+<div id="act-walk-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">🏋️</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">실내 운동</div><div id="act-gym-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">밖이 별로면 안이 답</div></div>
+<div id="act-gym-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#D7DCEC">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">🧺</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">빨래</div><div id="act-laundry-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">습도 85%, 절대 안 마름</div></div>
+<div id="act-laundry-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">☕</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">데이트</div><div id="act-date-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">실내 코스면 무난</div></div>
+<div id="act-date-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#D7DCEC">★</span><span style="color:#D7DCEC">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #F2F3F8">
+<span style="font-size:21px;width:26px;text-align:center">💻</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">카페 작업</div><div id="act-cafe-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">빗소리 BGM, 집중 최적</div></div>
+<div id="act-cafe-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span></div>
+</div>
+
+<div style="display:flex;align-items:center;gap:12px;padding:12px 4px">
+<span style="font-size:21px;width:26px;text-align:center">🛋️</span>
+<div style="flex:1"><div style="font-size: 16px; font-weight: 700; color: #14161F">집콕</div><div id="act-home-desc" style="font-size: 12px; font-weight: 500; color: #3344C7">오늘의 정답. 이불 밖은 위험</div></div>
+<div id="act-home-stars" style="display:flex;gap:2px"><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span><span style="color:#4B61E8">★</span></div>
+</div>
+
+</div>
+</section>
+
+<!-- ============ SHARE ============ -->
+<section id="share" data-sec="" data-screen-label="Share" style="margin-top:34px">
+
+<h2 id="shareCardTitle" style="margin:4px 6px 16px;font-size:25px;font-weight:700;color:#14161F;letter-spacing:-.03em">오늘의 빡셈 카드</h2>
+
+<div id="shareCard" style="position: relative; border-radius: 26px; padding: 26px 22px; overflow: hidden; background: linear-gradient(160deg,#EFF3FE 0%,#DCE4FB 50%,#C9D6FA 100%); box-shadow: 0px 20px 50px -24px #4b61e82c">
+<div style="position:absolute;top:-30px;right:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.6),transparent 70%)"></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between">
+<span id="shareDayLabel" style="font-size:12px;font-weight:700;color:#3A47A8">📡 내일 빡셈지수</span>
+<span id="shareLoc" style="font-size:10.5px;font-weight:700;color:#3A47A8;opacity:.8">6.26(목) · 서울 강남구</span>
+</div>
+<div style="position:relative;display:flex;align-items:flex-end;gap:10px;margin-top:14px">
+<span id="shareScore" style="font-size:72px;font-weight:700;line-height:.85;letter-spacing:-.05em;color:#14161F">78</span>
+<div style="padding-bottom:8px">
+<span id="shareGrade" style="display:inline-block;font-size:18px;font-weight:700;color:#fff;background:#3344C7;padding:4px 11px;border-radius:10px;letter-spacing:.03em">HELL</span>
+<div id="shareBossLine" style="font-size:10.5px;font-weight:700;color:#3A47A8;margin-top:5px">오늘의 보스몹 · 💧 습도</div>
+</div>
+</div>
+<div style="position:relative;margin-top:16px;background:rgba(20,22,31,.9);border-radius:16px;padding:14px 16px">
+<div id="shareVerdict" style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.4;text-wrap:pretty">흰 바지 금지.<br>내일은 바닥이 이깁니다.</div>
+</div>
+<div id="shareTags" style="position:relative;display:flex;gap:7px;margin-top:14px">
+<span style="font-size:10.5px;font-weight:700;color:#3A47A8;background:rgba(255,255,255,.6);padding:6px 10px;border-radius:9px">☔ 폭우</span>
+<span style="font-size:10.5px;font-weight:700;color:#3A47A8;background:rgba(255,255,255,.6);padding:6px 10px;border-radius:9px">💧 습도 85%</span>
+<span style="font-size:10.5px;font-weight:700;color:#3A47A8;background:rgba(255,255,255,.6);padding:6px 10px;border-radius:9px">😷 미세먼지 나쁨</span>
+</div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:22px">
+<button id="shareBtn" style="flex:1;border:none;cursor:pointer;background:#14161F;color:#fff;font-family:Pretendard,sans-serif;font-size:14px;font-weight:700;padding:15px;border-radius:16px" data-comment-anchor="00a224415e-button">공유하기 ↗</button>
+<button id="saveBtn" style="flex: none; border: none; cursor: pointer; background: #fff; color: #14161F; font-family: Pretendard,sans-serif; font-size: 14px; font-weight: 700; padding: 15px 20px; border-radius: 16px; box-shadow: 0px 6px 16px -8px #14161f2d">이미지 저장</button>
+</div>
+<div id="shareToast" style="text-align:center;font-size:12px;font-weight:700;color:#4B61E8;margin-top:12px;height:16px;opacity:0;transition:opacity .3s"></div>
+
+<div style="text-align:center;margin-top:26px">
+<div style="font-size:10.5px;font-weight:600;color:#A6AAB8">날씨·미세먼지·교통·요일을 생활 난이도로 변환합니다</div>
+<div id="shareFooterLabel" style="font-size:10.5px;font-weight:700;color:#8A8FA3;margin-top:4px">📡 내일 빡셈지수</div>
+</div>
+</section>
+
+</div>
+</div>
+</div>
+
+<script>
+class App {
+  // 강남구 기본 좌표 — GPS 거부/차단 시 사용
+  DEFAULT_LOC = { lat: 37.5172, lon: 127.0473, label: '서울 강남구' };
+  WDAY = ['일', '월', '화', '수', '목', '금', '토'];
+  BOSSINFO = {
+    life: { key: '습도', emoji: '💧', sub: '끈적임의 군주', atk: '끈적임 · 불쾌지수', passive: '샤워 후 5분 재출현', weak: '실내 · 제습기 · 에어컨 송풍' },
+    weather: { key: '폭우', emoji: '🌧️', sub: '폭우의 지배자', atk: '침수 · 옷 젖음', passive: '우산 내구도 감소', weak: '장우산 · 방수화 · 실내' },
+    air: { key: '미세먼지', emoji: '😷', sub: '잿빛 안개군주', atk: '폐활량 · 외출 만족도', passive: '창문 열면 재유입', weak: 'KF94 · 공기청정기 · 실내' },
+    move: { key: '강풍', emoji: '🌬️', sub: '바람의 광폭자', atk: '우산 파괴 · 헤어 붕괴', passive: '체감온도 급강하', weak: '우비 · 모자 · 대중교통' },
+    day: { key: '요일', emoji: '📅', sub: '권태의 망령', atk: '의욕 · 정신력 저하', passive: '주말까지 지속', weak: '커피 · 루틴 · 보상 예약' },
+  };
+
+  componentDidMount() {
+    this._live = null;
+    this._curScore = 0;
+    this.updateDayToggle();
+    this.updateDayLabels();
+    this.refreshDate();
+    this.applyTweaks();
+    this.animateScore(this.scoreVal());
+    this.initChipScroll();
+    this.loadLocationAndWeather(true); // GPS 자동 시도 → 실패 시 기본 좌표로 날씨 로드
+  }
+  componentDidUpdate() { if (this._weather) this.renderAll(); else this.applyTweaks(); }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+
+  animateScore(target) {
+    const numEl = document.getElementById('bigScore');
+    const dot = document.getElementById('meterDot');
+    const from = this._curScore || 0, dur = 1000, t0 = performance.now();
+    const ease = p => 1 - Math.pow(1 - p, 3);
+    const tick = t => {
+      const p = Math.min(1, (t - t0) / dur);
+      const v = from + (target - from) * ease(p);
+      if (numEl) numEl.textContent = Math.round(v);
+      if (dot) dot.style.left = v + '%';
+      if (p < 1) requestAnimationFrame(tick); else this._curScore = target;
+    };
+    requestAnimationFrame(tick);
+  }
+  initChipScroll() {
+    const chips = [...document.querySelectorAll('[data-chip]')];
+    const setActive = id => chips.forEach(c => {
+      const on = c.dataset.chip === id;
+      c.style.background = on ? '#4B61E8' : 'transparent';
+      c.style.color = on ? '#fff' : '#6B7080';
+    });
+    const secs = [...document.querySelectorAll('[data-sec]')];
+    if (secs.length) {
+      this._io = new IntersectionObserver(entries => {
+        const vis = entries.filter(e => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (vis) setActive(vis.target.id);
+      }, { rootMargin: '-44% 0px -50% 0px', threshold: [0, .25, .5, 1] });
+      secs.forEach(s => this._io.observe(s));
+    }
+  }
+  scoreVal() {
+    if (this._live && isFinite(this._live.total)) return Math.max(0, Math.min(100, Math.round(this._live.total)));
+    let s = Number(this.props.score);
+    if (!isFinite(s)) s = 78;
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }
+  gradeFor(s) {
+    const dw = this._dayOffset === 0 ? '오늘' : '내일';
+    if (s <= 30) return { key: 'EASY', range: '0–30', color: '#6E86F5', idx: 0,
+      verdict: dw + '은 무난해요.<br>그냥 나가도 됩니다.', sub: '특별한 디버프 없음. 평화로운 하루.' };
+    if (s <= 55) return { key: 'NORMAL', range: '31–55', color: '#5B6CF0', idx: 1,
+      verdict: '그럭저럭한 하루.<br>' + dw + '은 우산만 챙기면 OK.', sub: '가벼운 디버프 몇 개. 방심은 금물.' };
+    if (s <= 75) return { key: 'HARD', range: '56–75', color: '#4B61E8', idx: 2,
+      verdict: '각오 단단히.<br>' + dw + '은 변수가 많은 날입니다.', sub: '디버프 누적 중. 장비를 점검하세요.' };
+    if (s <= 90) return { key: 'HELL', range: '76–90', color: '#3344C7', idx: 3,
+      verdict: '흰 바지 금지.<br>' + dw + '은 바닥이 이깁니다.', sub: '비·습도·미세먼지 3종 세트. ' + dw + '의 보스몹은 <b style="color:#9DB4FF">' + (this._boss ? this._boss.key : '습도') + '</b>입니다.' };
+    return { key: 'BOSS DAY', range: '91–100', color: '#232E8F', idx: 4,
+      verdict: dw + '은 이불 밖이<br>곧 죽음입니다.', sub: '전 변수 빨강. ' + dw + '의 보스 레이드 권장: <b style="color:#9DB4FF">집콕</b>.' };
+  }
+  applyTweaks() {
+    const s = this.scoreVal();
+    const g = this.gradeFor(s);
+    const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
+    if (this._weather) set('tempRange', el => el.textContent = this._weather.tmin + '° / ' + this._weather.tmax + '°C');
+    set('bigScore', el => el.textContent = s);
+    set('shareScore', el => el.textContent = s);
+    set('bdTitleScore', el => el.textContent = s);
+    set('bdTotal', el => el.textContent = s);
+    set('gradeTagHeader', el => { el.textContent = g.key; el.style.background = g.color; });
+    set('gradeLabelHome', el => el.textContent = g.key);
+    set('gradeRangeHome', el => el.textContent = g.range);
+    set('gradeBoxHome', el => el.style.background = g.color);
+    set('shareGrade', el => { el.textContent = g.key; el.style.background = g.color; });
+    set('verdictMain', el => el.innerHTML = g.verdict);
+    set('verdictSub', el => el.innerHTML = g.sub);
+    set('shareVerdict', el => el.innerHTML = g.verdict);
+    set('meterDot', el => el.style.left = s + '%');
+    set('meterLabels', el => [...el.children].forEach((c, i) => { c.style.color = i === g.idx ? g.color : '#A6AAB8'; }));
+    const charIdx = s <= 29 ? 1 : s <= 49 ? 2 : s <= 69 ? 3 : s <= 89 ? 4 : 5;
+    set('charImg', el => { const src = 'assets/char-' + charIdx + '.png'; if (!el.src.endsWith(src)) el.src = src; });
+    const hueMap = { '스카이 블루': 0, '인디고': 16, '민트 틸': -58, '퍼플': 44 };
+    const moodMap = { '순한맛': { sat: .78, con: 1, fx: .3 }, '보통': { sat: 1, con: 1, fx: .5 }, '매운맛': { sat: 1.32, con: 1.06, fx: .72 } };
+    const deg = hueMap[this.props.accent] ?? 0;
+    const m = moodMap[this.props.mood] || moodMap['보통'];
+    const filter = 'saturate(' + m.sat + ') contrast(' + m.con + ') hue-rotate(' + deg + 'deg)';
+    set('hudHeader', el => el.style.filter = filter);
+    set('hudBody', el => el.style.filter = filter);
+    // 비 모션: 생활 난이도(빡셈지수) 50점 이하면 숨김
+    set('rainFx', el => { const on = s > 50; el.style.display = on ? 'block' : 'none'; el.style.opacity = on ? m.fx : 0; });
+    this.sortBreakdown();
+  }
+  // 변수분석 목록을 점수 높은 순으로 정렬
+  sortBreakdown() {
+    const list = document.getElementById('bdList');
+    if (!list) return;
+    [...list.children]
+      .map(r => { const sc = r.querySelector('[id$="Score"]'); return { r, v: sc ? (parseInt(sc.textContent, 10) || 0) : 0 }; })
+      .sort((a, b) => b.v - a.v)
+      .forEach(o => list.appendChild(o.r));
+  }
+  toast(msg) {
+    const t = document.getElementById('shareToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => { t.style.opacity = '0'; }, 1800);
+  }
+  /* ---------- 날짜 ---------- */
+  refreshDate() { this.renderLocLine(); }
+  renderLocLine() {
+    const region = this._region || this.DEFAULT_LOC.label;
+    const d = new Date(); d.setDate(d.getDate() + this._dayOffset);
+    const ds = (d.getMonth() + 1) + '.' + d.getDate() + '(' + this.WDAY[d.getDay()] + ')';
+    const dayWord = this._dayOffset === 0 ? '오늘' : '내일';
+    const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+    set('locLine', region + ' · ' + dayWord + ' ' + ds);
+    set('shareLoc', ds + ' · ' + region);
+  }
+
+  /* ---------- GPS + 날씨 로드 ---------- */
+  async loadLocationAndWeather(auto) {
+    let coords = null;
+    try { coords = await this.getGPS(); }
+    catch (e) { if (!auto) this.toast('위치 권한을 허용해 주세요 📍'); }
+    const loc = coords || this.DEFAULT_LOC;
+    const [region, weather] = await Promise.all([
+      this.reverseGeocode(loc.lat, loc.lon).catch(() => coords ? null : this.DEFAULT_LOC.label),
+      this.fetchWeather(loc.lat, loc.lon).catch(() => null),
+    ]);
+    if (region) { this._region = region; this.renderLocLine(); if (coords) this.toast('📍 ' + region + '(으)로 갱신'); }
+    if (weather) { weather.forEach((w, i) => this.applyWeather(w, i)); }
+  }
+  getGPS() {
+    return new Promise((res, rej) => {
+      if (!navigator.geolocation) return rej(new Error('geolocation 미지원'));
+      navigator.geolocation.getCurrentPosition(
+        p => res({ lat: p.coords.latitude, lon: p.coords.longitude }),
+        err => rej(err),
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+      );
+    });
+  }
+  async reverseGeocode(lat, lon) {
+    const url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=ko';
+    const j = await (await fetch(url)).json();
+    const strip = s => (s || '').replace(/(특별시|광역시|특별자치시|특별자치도|도)$/, '');
+    const prov = strip(j.principalSubdivision);
+    // 시/도 하위의 구·군 단위를 우선 사용
+    const admin = ((j.localityInfo && j.localityInfo.administrative) || []).map(a => a.name || '');
+    const dist = admin.find(n => /[구군]$/.test(n))
+      || (/[구군]$/.test(j.city || '') ? j.city : '')
+      || (/[구군]$/.test(j.locality || '') ? j.locality : '');
+    if (dist && strip(dist) !== prov) return (prov ? prov + ' ' : '') + dist;
+    // 구/군이 없으면 시·도 명칭 단독 사용 (중복 방지)
+    return j.principalSubdivision || j.city || j.locality || null;
+  }
+
+  /* ---------- 날씨 API (OpenWeatherMap) ----------
+     ▼ 다른 날씨 API로 바꾸려면 fetchWeather / parseWeather 만 교체.
+        parseWeather 는 { precip, rain, tmax, tmin, wind, code, hum, pm10, pm25, wday } 를 반환하면 됩니다. */
+  async fetchWeather(lat, lon) {
+    const key = '2fd9b7c80de7ab42ddb36f08a1cd09eb';
+    const [fc, air] = await Promise.all([
+      fetch('https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + '&appid=' + key + '&units=metric').then(r => r.json()),
+      fetch('https://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=' + lat + '&lon=' + lon + '&appid=' + key).then(r => r.json()).catch(() => null),
+    ]);
+    return [this.parseWeather(fc, air, 0), this.parseWeather(fc, air, 1)];
+  }
+  parseWeather(fc, air, dayOffset = 1) {
+    const localStr = ts => {
+      const d = new Date(ts * 1000);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    };
+    const target = new Date();
+    target.setDate(target.getDate() + dayOffset);
+    const targetStr = target.getFullYear() + '-' + String(target.getMonth()+1).padStart(2,'0') + '-' + String(target.getDate()).padStart(2,'0');
+
+    const items = (fc.list || []).filter(i => localStr(i.dt) === targetStr);
+    const src = items.length ? items : (fc.list || []).slice(0, 8);
+
+    const temps = src.map(i => i.main.temp);
+    const tmax = Math.round(Math.max(...temps));
+    const tmin = Math.round(Math.min(...temps));
+    const wind = Math.round(Math.max(...src.map(i => (i.wind || {}).speed || 0)));
+    const hum = Math.round(src.reduce((s, i) => s + i.main.humidity, 0) / src.length);
+    const pop = Math.round(Math.max(...src.map(i => (i.pop || 0) * 100)));
+    const rain = +src.reduce((s, i) => s + ((i.rain && i.rain['3h']) || 0), 0).toFixed(1);
+
+    const sevScore = id => id < 300 ? 6 : id < 400 ? 2 : id < 600 ? 5 : id < 700 ? 3 : id < 800 ? 1 : id === 800 ? 0 : (id - 800) * 0.3;
+    const ids = src.map(i => i.weather[0].id);
+    const worstId = ids.reduce((a, b) => sevScore(a) >= sevScore(b) ? a : b, ids[0] || 800);
+    const owmToWmo = id => {
+      if (id >= 200 && id < 300) return 95;
+      if (id >= 300 && id < 400) return 51;
+      if (id >= 500 && id < 510) return 63;
+      if (id >= 510 && id < 600) return 80;
+      if (id >= 600 && id < 700) return 71;
+      if (id >= 700 && id < 800) return 45;
+      if (id === 800) return 0;
+      if (id <= 802) return 2;
+      return 3;
+    };
+
+    const airItems = (air && air.list || []).filter(i => localStr(i.dt) === targetStr);
+    const pm10 = airItems.length ? Math.round(Math.max(...airItems.map(i => i.components.pm10 || 0))) : 45;
+    const pm25 = airItems.length ? Math.round(Math.max(...airItems.map(i => i.components.pm2_5 || 0))) : 22;
+
+    return {
+      precip: pop, rain, tmax, tmin, wind,
+      code: owmToWmo(worstId),
+      hum, pm10, pm25,
+      wday: target.getDay(),
+    };
+  }
+
+  /* ---------- 날씨 → 빡셈지수 변환 ---------- */
+  applyWeather(w, dayIndex = 1) {
+    const c = v => Math.max(0, Math.min(20, Math.round(v)));
+    const di = this.discomfort(w.tmax, w.hum);
+    const sub = {
+      weather: c(4 + w.precip / 100 * 13 + (w.tmax >= 28 ? 2 : 0) + (w.code >= 51 ? 1 : 0)),
+      air: c(2 + w.pm10 / 150 * 18),
+      move: c(4 + w.wind / 12 * 9 + w.precip / 100 * 6 + (w.wind >= 10 ? 1 : 0)),
+      life: c((w.hum - 40) / 55 * 15 + (di >= 80 ? 3 : di >= 75 ? 1 : 0) + 2),
+      day: c(({ 0: 9, 1: 16, 2: 14, 3: 13, 4: 12, 5: 8, 6: 5 })[w.wday] ?? 12),
+    };
+    sub.total = sub.weather + sub.air + sub.move + sub.life + sub.day;
+    const boss = this.pickBoss(sub);
+    const live = Object.assign({}, sub, { boss });
+    this._dayData[dayIndex] = { live, weather: w, sub, boss };
+    if (dayIndex === this._dayOffset) {
+      this._live = live;
+      this._weather = w; this._sub = sub; this._boss = boss;
+      this.renderAll();
+    }
+  }
+  renderAll() {
+    if (!this._weather) return;
+    this.applyTweaks();
+    this.animateScore(this.scoreVal());
+    this.renderBreakdown(this._weather, this._sub);
+    this.renderBoss(this._boss, this._sub);
+    this.updateDebuff(this._weather, this._sub);
+    this.updateTags(this._weather, this._sub);
+    this.updateActivity(this._weather);
+  }
+  pickBoss(sub) {
+    let best = 'life', bv = -1;
+    ['life', 'weather', 'air', 'move', 'day'].forEach(k => { if (sub[k] > bv) { bv = sub[k]; best = k; } });
+    return Object.assign({ k: best }, this.BOSSINFO[best]);
+  }
+  renderBreakdown(w, s) {
+    const cat10 = v => v <= 30 ? '좋음' : v <= 80 ? '보통' : v <= 150 ? '나쁨' : '매우나쁨';
+    const cat25 = v => v <= 15 ? '좋음' : v <= 35 ? '보통' : v <= 75 ? '나쁨' : '매우나쁨';
+    const rows = [
+      ['bdw', s.weather, '강수확률 ' + w.precip + '% · ' + this.codeText(w.code) + ' · 기온 ' + w.tmax + '°C'],
+      ['bda', s.air, '미세먼지 ' + cat10(w.pm10) + '(' + w.pm10 + ') · 초미세 ' + cat25(w.pm25)],
+      ['bdm', s.move, '바람 ' + w.wind + 'm/s · ' + (w.precip >= 50 ? '우산 무력화 가능' : '이동 무난')],
+      ['bdl', s.life, '습도 ' + w.hum + '% · 불쾌지수 ' + this.discomfort(w.tmax, w.hum)],
+      ['bdd', s.day, this.WDAY[w.wday] + '요일 · 주말까지 D-' + this.daysToWeekend(w.wday)],
+    ];
+    rows.forEach(([id, v, desc]) => {
+      const sc = document.getElementById(id + 'Score');
+      if (sc) sc.innerHTML = v + '<span style="color:#C4C8D6;font-weight:700">/20</span>';
+      const bar = document.getElementById(id + 'Bar');
+      if (bar) bar.style.width = (v / 20 * 100) + '%';
+      const dd = document.getElementById(id + 'Desc');
+      if (dd) dd.textContent = desc;
+    });
+    this.sortBreakdown();
+  }
+  renderBoss(b, sub) {
+    const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
+    set('bossName', el => el.textContent = b.key);
+    set('bossSub', el => el.textContent = b.sub);
+    set('bossEmoji', el => el.textContent = b.emoji);
+    const dw2 = this._dayOffset === 0 ? '오늘' : '내일';
+    set('verdictSub', el => el.innerHTML = dw2 + '의 보스몹은 <b style="color:#9DB4FF">' + b.key + '</b>입니다.');
+    set('shareBossLine', el => el.textContent = dw2 + '의 보스몹 · ' + b.emoji + ' ' + b.key);
+    if (sub) {
+      const v = sub[b.k];
+      const pct = Math.max(20, Math.min(100, Math.round(v / 20 * 100)));
+      set('bossHpText', el => el.textContent = (pct * 100).toLocaleString() + ' / 10,000');
+      set('bossHpBar', el => el.style.width = pct + '%');
+      set('bossLevel', el => el.textContent = 'LV.' + (60 + Math.round(v * 2)) + ' · ELITE');
+      set('bossAtk', el => el.textContent = b.atk);
+      set('bossPassive', el => el.textContent = b.passive);
+      set('bossWeak', el => el.textContent = b.weak);
+    }
+  }
+  cat10(v) { return v <= 30 ? '좋음' : v <= 80 ? '보통' : v <= 150 ? '나쁨' : '매우나쁨'; }
+  levelOf(v) { return v >= 15 ? 3 : v >= 9 ? 2 : v >= 4 ? 1 : 0; }
+  badgeFor(level, isBoss) {
+    if (isBoss) return { t: 'BOSS', bg: '#3344C7', c: '#fff' };
+    if (level >= 3) return { t: '치명적', bg: '#E1E6FA', c: '#232E8F' };
+    if (level >= 2) return { t: '나쁨', bg: '#E8ECFD', c: '#4B61E8' };
+    if (level >= 1) return { t: '주의', bg: '#E8ECFD', c: '#4B61E8' };
+    return { t: '약함', bg: '#EEF0F7', c: '#6B7080' };
+  }
+  renderBars(el, filled, color) {
+    el.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const s = document.createElement('span');
+      s.style.cssText = 'width:7px;height:18px;border-radius:3px;background:' + (i < filled ? color : '#E7E9F0');
+      el.appendChild(s);
+    }
+  }
+  renderStars(el, n) {
+    el.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const s = document.createElement('span');
+      s.textContent = '★';
+      s.style.color = i < n ? '#4B61E8' : '#D7DCEC';
+      el.appendChild(s);
+    }
+  }
+  updateDebuff(w, sub) {
+    const di = this.discomfort(w.tmax, w.hum);
+    const name = { life: '습도', weather: '폭우', air: '미세먼지', move: '강풍', day: this.WDAY[w.wday] + '요일' };
+    const desc = {
+      life: '습도 ' + w.hum + '% · 불쾌지수 ' + di,
+      weather: '강수확률 ' + w.precip + '% · 강수량 ' + w.rain + 'mm',
+      air: '미세먼지 ' + w.pm10 + '(' + this.cat10(w.pm10) + ') · 폐활량 ↓',
+      move: '바람 ' + w.wind + 'm/s · ' + (w.wind >= 10 ? '우산 파괴 위험' : '헤어 붕괴 주의'),
+      day: this.WDAY[w.wday] + '요일 · 주말까지 D-' + this.daysToWeekend(w.wday),
+    };
+    const order = ['life', 'weather', 'air', 'move', 'day'].sort((a, b) => sub[b] - sub[a]);
+    const top = order[0];
+    const list = document.getElementById('dbList');
+    order.forEach(k => {
+      const level = this.levelOf(sub[k]);
+      const isBoss = k === top;
+      const bd = this.badgeFor(level, isBoss);
+      const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
+      set('dbName-' + k, el => el.textContent = name[k]);
+      set('dbDesc-' + k, el => el.textContent = desc[k]);
+      set('dbBadge-' + k, el => { el.textContent = bd.t; el.style.background = bd.bg; el.style.color = bd.c; });
+      set('dbBars-' + k, el => this.renderBars(el, Math.max(1, level), isBoss ? '#3344C7' : level >= 1 ? '#6E86F5' : '#8B90A6'));
+      const card = document.getElementById('db-' + k);
+      if (list && card) list.appendChild(card);
+    });
+  }
+  updateTags(w, sub) {
+    const text = {
+      life: '💧 습도 ' + w.hum + '%',
+      weather: '☔ 강수 ' + w.precip + '%',
+      air: '😷 미세먼지 ' + this.cat10(w.pm10),
+      move: '🌬️ 강풍 ' + w.wind + 'm/s',
+      day: '📅 ' + this.WDAY[w.wday] + '요일',
+    };
+    const top = ['life', 'weather', 'air', 'move', 'day'].sort((a, b) => sub[b] - sub[a]).slice(0, 3);
+    const box = document.getElementById('shareTags');
+    if (!box) return;
+    box.innerHTML = '';
+    top.forEach(k => {
+      const s = document.createElement('span');
+      s.style.cssText = 'font-size:10.5px;font-weight:700;color:#3A47A8;background:rgba(255,255,255,.6);padding:6px 10px;border-radius:9px';
+      s.textContent = text[k];
+      box.appendChild(s);
+    });
+  }
+  updateActivity(w) {
+    const heavyRain = w.precip >= 50, rain = w.precip >= 20, dusty = w.pm10 > 80, humid = w.hum >= 80;
+    const acts = {
+      commute: heavyRain ? [2, '회피 불가… 일찍 나서세요'] : [3, '서두르면 무난한 출근길'],
+      walk: (heavyRain || dusty) ? [1, '비+미세먼지, ' + (this._dayOffset === 0 ? '오늘' : '내일') + '은 패스'] : (rain || w.pm10 > 50) ? [3, '우산 챙기면 가능'] : [5, '산책하기 좋은 날'],
+      gym: (heavyRain || dusty) ? [4, '밖이 별로면 안이 답'] : [3, '가볍게 몸 풀기 좋아요'],
+      laundry: humid ? [1, '습도 ' + w.hum + '%, 절대 안 마름'] : (rain || w.hum >= 65) ? [2, '실내 건조 권장'] : [4, '잘 마르는 날'],
+      date: heavyRain ? [3, '실내 코스면 무난'] : [4, '무난한 데이트 날씨'],
+      cafe: rain ? [5, '빗소리 BGM, 집중 최적'] : [4, '집중하기 좋아요'],
+      home: (heavyRain || dusty || humid) ? [5, '오늘의 정답. 이불 밖은 위험'] : [3, '쉬어가도 좋은 날'],
+    };
+    Object.keys(acts).forEach(k => {
+      const [stars, d] = acts[k];
+      const ds = document.getElementById('act-' + k + '-desc'); if (ds) ds.textContent = d;
+      const st = document.getElementById('act-' + k + '-stars'); if (st) this.renderStars(st, stars);
+    });
+  }
+  discomfort(t, h) { return Math.round(0.81 * t + 0.01 * h * (0.99 * t - 14.3) + 46.3); }
+  daysToWeekend(wd) { return (wd === 0 || wd === 6) ? 0 : 6 - wd; }
+  codeText(c) {
+    if (c === 0) return '맑음';
+    if (c <= 3) return '구름 많음';
+    if (c <= 48) return '안개';
+    if (c <= 57) return '이슬비';
+    if (c <= 67) return '비';
+    if (c <= 77) return '눈';
+    if (c <= 82) return '소나기';
+    if (c <= 86) return '진눈깨비';
+    return '뇌우';
+  }
+
+  renderVals() {
+    return {
+      refreshLocation: () => this.loadLocationAndWeather(false),
+      share: () => {
+        const s = this.scoreVal(), g = this.gradeFor(s);
+        const boss = (this._live && this._live.boss) ? this._live.boss.key : '습도';
+        const url = window.location.href;
+        const dayWord = this._dayOffset === 0 ? '오늘' : '내일';
+        const text = dayWord + ' 빡셈지수 ' + s + ' · ' + g.key + ' 🔥 오늘의 보스몹은 ' + boss + '입니다.';
+        if (navigator.share) { navigator.share({ title: dayWord + ' 빡셈지수', text, url }).catch(() => {}); }
+        else { try { navigator.clipboard.writeText(text + '\n' + url); } catch (e) {} this.toast('링크를 복사했어요 📋'); }
+      },
+      save: () => this.toast('이미지로 저장됐어요 💾'),
+    };
+  }
+
+  updateDayToggle() {
+    const offset = this._dayOffset;
+    const todayBtn = document.getElementById('toggleToday');
+    const tmrwBtn = document.getElementById('toggleTomorrow');
+    if (todayBtn) { todayBtn.style.background = offset === 0 ? '#14161F' : '#F0F1F6'; todayBtn.style.color = offset === 0 ? '#fff' : '#6B7080'; }
+    if (tmrwBtn)  { tmrwBtn.style.background  = offset === 1 ? '#14161F' : '#F0F1F6'; tmrwBtn.style.color  = offset === 1 ? '#fff' : '#6B7080'; }
+  }
+  updateDayLabels() {
+    const dw = this._dayOffset === 0 ? '오늘' : '내일';
+    const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+    set('appTitle', dw + ' 빡셈지수');
+    set('dayLabelHome', dw + '의 생활 난이도');
+    set('dayLabelBoss', dw + '의 보스몹');
+    set('dayLabelKit', dw + '의 생존 장비');
+    set('dayLabelActivity', dw + ' 뭐하기 좋을까');
+    set('shareCardTitle', dw + '의 빡셈 카드');
+    set('shareDayLabel', '📡 ' + dw + ' 빡셈지수');
+    set('shareFooterLabel', '📡 ' + dw + ' 빡셈지수');
+    document.title = dw + ' 빡셈지수';
+    const bg = '#FFFFFF';
+    document.body.style.background = bg;
+    const wrap = document.getElementById('pageWrap');
+    if (wrap) wrap.style.background = bg;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const app = new App();
+  app.props = { score: 78, accent: '스카이 블루', mood: '매운맛' };
+  app._live = null;
+  app._curScore = 0;
+  app._weather = null;
+  app._sub = null;
+  app._boss = null;
+  app._region = null;
+  app._dayOffset = 1;
+  app._dayData = [null, null];
+  app._io = null;
+  app._tt = null;
+
+  // day toggle
+  document.getElementById('toggleToday').addEventListener('click', () => {
+    app._dayOffset = 0;
+    app.updateDayToggle();
+    app.renderLocLine();
+    app.updateDayLabels();
+    const d = app._dayData[0];
+    if (d) { app._live = d.live; app._weather = d.weather; app._sub = d.sub; app._boss = d.boss; app.renderAll(); }
+  });
+  document.getElementById('toggleTomorrow').addEventListener('click', () => {
+    app._dayOffset = 1;
+    app.updateDayToggle();
+    app.renderLocLine();
+    app.updateDayLabels();
+    const d = app._dayData[1];
+    if (d) { app._live = d.live; app._weather = d.weather; app._sub = d.sub; app._boss = d.boss; app.renderAll(); }
+  });
+
+  const locLine = document.getElementById('locLine');
+  if (locLine) locLine.addEventListener('click', () => app.loadLocationAndWeather(false));
+
+  app.componentDidMount();
+
+  const vals = app.renderVals();
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) shareBtn.addEventListener('click', vals.share);
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) saveBtn.addEventListener('click', vals.save);
+});
+
+</script>
+</body>
+</html>
